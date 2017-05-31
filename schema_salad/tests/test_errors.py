@@ -9,6 +9,7 @@ class TestErrors(unittest.TestCase):
     def test_errors(self):
         document_loader, avsc_names, schema_metadata, metaschema_loader = load_schema(
             get_data(u"tests/test_schema/CommonWorkflowLanguage.yml"))
+
         avsc_names = cast(Names, avsc_names)
 
         for t in ("test_schema/test1.cwl",

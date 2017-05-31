@@ -37,6 +37,9 @@ DocumentOrStrType = TypeVar(
     'DocumentOrStrType', CommentedSeq, CommentedMap, unicode)
 
 def file_uri(path, split_frag=False):  # type: (str, bool) -> str
+    print("in file uri")
+    print("path in")
+    print(path)
     if path.startswith("file://"):
         return path
     if split_frag:
@@ -52,6 +55,9 @@ def file_uri(path, split_frag=False):  # type: (str, bool) -> str
         return "file://%s%s" % (urlpath, frag)
 
 def uri_file_path(url):  # type: (str) -> str
+    print("in uri file path")
+    print("path in")
+    print(url)
     split = urlparse.urlsplit(url)
     if split.scheme == "file":
         return urllib.url2pathname(
@@ -119,13 +125,18 @@ class DefaultFetcher(Fetcher):
         self.session = session
 
     def fetch_text(self, url):
+        print("in fetch text")
+        print("url in")
+        print(url)
+
         # type: (unicode) -> unicode
         if url in self.cache:
             return self.cache[url]
 
         split = urlparse.urlsplit(url)
         scheme, path = split.scheme, split.path
-
+        print("split in fetch text")
+        print(split)
         if scheme in [u'http', u'https'] and self.session is not None:
             try:
                 resp = self.session.get(url)
@@ -135,6 +146,8 @@ class DefaultFetcher(Fetcher):
             return resp.text
         elif scheme == 'file':
             try:
+                print("separated path below")
+                print(path)
                 with open(urllib.url2pathname(str(path))) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):
@@ -150,6 +163,10 @@ class DefaultFetcher(Fetcher):
             raise ValueError('Unsupported scheme in url: %s' % url)
 
     def check_exists(self, url):  # type: (unicode) -> bool
+        print("in check exists")
+        print("url in")
+        print(url)
+
         if url in self.cache:
             return True
 
@@ -169,6 +186,16 @@ class DefaultFetcher(Fetcher):
             raise ValueError('Unsupported scheme in url: %s' % url)
 
     def urljoin(self, base_url, url):  # type: (Text, Text) -> Text
+
+        basesplit = urlparse.urlsplit(base_url)
+        if basesplit.scheme:
+            split = urlparse.urlsplit(url)
+            url = urlparse.urlunsplit(('',split.netloc, split.path, split.query, split.fragment))
+        print("in urljoin")
+        print("path in")
+        print(url)
+        print("base path")
+        print(base_url)
         return urlparse.urljoin(base_url, url)
 
 class Loader(object):
@@ -253,6 +280,12 @@ class Loader(object):
                    scoped_ref=None      # type: int
                    ):
         # type: (...) -> unicode
+        print("in expand url")
+        print("path in")
+        print(url)
+        print("base path")
+        print(base_url)
+
         if url in (u"@id", u"@type"):
             return url
 
@@ -266,8 +299,10 @@ class Loader(object):
 
         split = urlparse.urlsplit(url)
 
-        if (bool(split.scheme) or url.startswith(u"$(")
+        if ((bool(split.scheme) and split.scheme in ['http','https','file']) or url.startswith(u"$(")
             or url.startswith(u"${")):
+            print("without base url split is below")
+            print(split)
             pass
         elif scoped_id and not bool(split.fragment):
             splitbase = urlparse.urlsplit(base_url)
@@ -279,10 +314,14 @@ class Loader(object):
             pt = splitbase.path if splitbase.path != '' else "/"
             url = urlparse.urlunsplit(
                 (splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg))
+            print("with base url")
+            print(url)
         elif scoped_ref is not None and not split.fragment:
             pass
         else:
             url = self.fetcher.urljoin(base_url, url)
+            print("after url join")
+            print(url)
 
         if vocab_term and url in self.rvocab:
             return self.rvocab[url]
@@ -407,7 +446,9 @@ class Loader(object):
                     checklinks=True  # type: bool
                     ):
         # type: (...) -> Tuple[Union[CommentedMap, CommentedSeq, unicode, None], Dict[unicode, Any]]
-
+        print("in resolve ref")
+        print("ref inp")
+        print(ref)
         lref = ref           # type: Union[CommentedMap, CommentedSeq, unicode, None]
         obj = None           # type: Optional[CommentedMap]
         resolved_obj = None  # type: Optional[Union[CommentedMap, CommentedSeq, unicode]]
@@ -416,7 +457,8 @@ class Loader(object):
 
         if not base_url:
             base_url = file_uri(os.getcwd()) + "/"
-
+            print("base url is")
+            print(base_url)
         if isinstance(lref, (str, unicode)) and os.sep == "\\":
             # Convert Windows path separator in ref
             lref = lref.replace("\\", "/")
@@ -465,6 +507,8 @@ class Loader(object):
                     % (type(lref), unicode(lref)))
 
         url = self.expand_url(lref, base_url, scoped_id=(obj is not None))
+        print("url after expanding")
+        print(url)
         # Has this reference been loaded already?
         if url in self.idx and (not mixin):
             return self.idx[url], {}
@@ -830,6 +874,9 @@ class Loader(object):
         return document, metadata
 
     def fetch(self, url, inject_ids=True):  # type: (unicode, bool) -> Any
+        print("in fetch ")
+        print("url inp")
+        print(url)
         if url in self.idx:
             return self.idx[url]
         try:

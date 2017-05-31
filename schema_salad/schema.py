@@ -193,7 +193,8 @@ def load_schema(schema_ref,  # type: Union[CommentedMap, CommentedSeq, unicode]
     """Load a schema that can be used to validate documents using load_and_validate.
 
     return document_loader, avsc_names, schema_metadata, metaschema_loader"""
-
+    print("inside load schema")
+    print(schema_ref)
     metaschema_names, metaschema_doc, metaschema_loader = get_metaschema()
     if cache is not None:
         metaschema_loader.cache.update(cache)

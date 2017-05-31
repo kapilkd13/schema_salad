@@ -3,6 +3,7 @@ from typing import Optional, Text
 import os
 
 def get_data(filename):  # type: (Text) -> Optional[Text]
+    filename=os.path.normpath(filename)
     filepath = None
     try:
         filepath = resource_filename(
