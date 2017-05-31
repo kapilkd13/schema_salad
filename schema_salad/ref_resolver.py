@@ -153,6 +153,8 @@ class DefaultFetcher(Fetcher):
                 # remove the leading /.
                 if os.path.isabs(path[1:]):
                     path = path[1:]
+                print("after path fix for windows")
+                print(path)
                 with open(urllib.url2pathname(str(path))) as fp:
                     read = fp.read()
                 if hasattr(read, "decode"):

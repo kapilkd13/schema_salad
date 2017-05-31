@@ -23,13 +23,13 @@ class TestSchemas(unittest.TestCase):
         l = schema_salad.ref_resolver.Loader({})
 
         ra, _ = l.resolve_all(cmap({
-            u"$schemas": ["file://" + get_data("tests/EDAM.owl")],
+            u"$schemas": [schema_salad.ref_resolver.file_uri(get_data("tests/EDAM.owl"))],
             u"$namespaces": {u"edam": u"http://edamontology.org/"},
             u"edam:has_format": u"edam:format_1915"
         }), "")
 
         self.assertEqual({
-            u"$schemas": ["file://" + get_data("tests/EDAM.owl")],
+            u"$schemas": [schema_salad.ref_resolver.file_uri(get_data("tests/EDAM.owl"))],
             u"$namespaces": {u"edam": u"http://edamontology.org/"},
             u'http://edamontology.org/has_format': u'http://edamontology.org/format_1915'
         }, ra)
@@ -330,7 +330,8 @@ class TestSchemas(unittest.TestCase):
         print(g.serialize(format="n3"))
 
     def test_mixin(self):
-        base_url = "file://" + os.getcwd() + "/tests/"
+        base_url = schema_salad.ref_resolver.file_uri(os.path.join(os.getcwd(),os.path.normpath("/tests/")))
+       # base_url = "file://" + os.getcwd() + "/tests/"
         ldr = schema_salad.ref_resolver.Loader({})
         ra = ldr.resolve_ref(cmap({"$mixin": get_data("tests/mixin.yml"), "one": "five"}),
                              base_url=base_url)

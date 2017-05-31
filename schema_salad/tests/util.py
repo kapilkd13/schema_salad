@@ -12,6 +12,6 @@ def get_data(filename):  # type: (Text) -> Optional[Text]
         pass
     if not filepath or not os.path.isfile(filepath):
         filepath = os.path.join(os.path.dirname(__file__), os.pardir, filename)
-    if filepath[0] != "/":
-        filepath="/" + filepath  # for windows path which don't have / in its path
+    # if filepath[0] != "/":
+    #     filepath="/" + filepath  # for windows path which don't have / in its path
     return filepath
